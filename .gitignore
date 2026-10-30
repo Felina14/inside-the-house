@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+infra/cdk.out/
+infra/cdk.context.json
+# Run outputs stay local: they contain account-specific identifiers.
+results/
+VERIFY.md
