@@ -88,7 +88,8 @@ def make_tools(trace, guardrail=None):
         text = html_to_text(body)
         extra = {}
         if guardrail:
-            # Bedrock Guardrails never sees toolResult content in a Converse call (see VERIFY.md §3),
+            # The prompt-attack filter doesn't evaluate toolResult content in a Converse call
+            # (https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-prompt-attack.html),
             # so screen the document ourselves with ApplyGuardrail before the model gets it.
             r = bedrock.apply_guardrail(
                 guardrailIdentifier=guardrail[0],

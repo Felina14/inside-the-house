@@ -31,13 +31,19 @@ for g in /aws/codebuild/ith-strands-layer /aws/lambda/ith-agent /ith/vpc-flow-lo
   aws logs delete-log-group --log-group-name "$g" 2>/dev/null && echo "deleted $g" || true
 done
 
-echo "== CDK bootstrap (created for this project, tagged)"
-BOOT="cdk-hnb659fds-assets-$ACCOUNT-$AWS_REGION"
-empty_bucket "$BOOT"
-aws cloudformation delete-stack --stack-name CDKToolkit
-aws cloudformation wait stack-delete-complete --stack-name CDKToolkit
-aws s3api delete-bucket --bucket "$BOOT" 2>/dev/null || true
-aws ecr delete-repository --repository-name "cdk-hnb659fds-container-assets-$ACCOUNT-$AWS_REGION" --force 2>/dev/null || true
+# The CDK bootstrap stack is shared by every CDK app in the account and region. Only delete it when it was
+# created for this project:  DELETE_CDK_BOOTSTRAP=1 ./teardown.sh
+if [ "${DELETE_CDK_BOOTSTRAP:-0}" = 1 ]; then
+  echo "== CDK bootstrap"
+  BOOT="cdk-hnb659fds-assets-$ACCOUNT-$AWS_REGION"
+  empty_bucket "$BOOT"
+  aws cloudformation delete-stack --stack-name CDKToolkit
+  aws cloudformation wait stack-delete-complete --stack-name CDKToolkit
+  aws s3api delete-bucket --bucket "$BOOT" 2>/dev/null || true
+  aws ecr delete-repository --repository-name "cdk-hnb659fds-container-assets-$ACCOUNT-$AWS_REGION" --force 2>/dev/null || true
+else
+  echo "== CDK bootstrap left in place (set DELETE_CDK_BOOTSTRAP=1 to remove it)"
+fi
 
 echo "== remaining resources tagged project=inside-the-house"
 aws resourcegroupstaggingapi get-resources --tag-filters Key=project,Values=inside-the-house \

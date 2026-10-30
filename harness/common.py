@@ -21,7 +21,7 @@ MODELS = {
     "pro": "us.amazon.nova-pro-v1:0",
 }
 JUDGE_MODEL = MODELS["micro"]
-# USD per 1K tokens (in, out), AWS Price List API, us-east-1, 30 Oct 2026. See VERIFY.md §4.
+# USD per 1K tokens (in, out), AWS Price List API, us-east-1, 30 Oct 2026. Used only for the spend guard.
 PRICES = {
     MODELS["micro"]: (0.000035, 0.00014),
     MODELS["lite"]: (0.00033, 0.00275),
